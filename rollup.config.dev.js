@@ -120,6 +120,5 @@ const rollup = {
     clearScreen: false,
   },
 };
-console.log("-****");
 
 export default rollup;
