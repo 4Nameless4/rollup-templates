@@ -1,6 +1,7 @@
 import typescript from "rollup-plugin-typescript2";
 import progress from "rollup-plugin-progress";
 import nodeResolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import serve from "rollup-plugin-serve";
 import fs from "fs";
@@ -87,6 +88,7 @@ const rollup = {
       extensions: [".js", ".ts"],
       modulesOnly: true,
     }),
+    commonjs(),
     progress(),
     json(),
     typescript({
