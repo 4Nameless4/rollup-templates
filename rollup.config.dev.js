@@ -4,8 +4,8 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import serve from "rollup-plugin-serve";
-import fs from "fs";
 import os from "os";
+import glob from "glob";
 
 const dir = "./dist";
 
@@ -21,73 +21,60 @@ for (let n in inf) {
   }
 }
 
-if (!fs.existsSync("./dist")) {
-  fs.mkdirSync("./dist");
+function generateHtmlPlugin() {
+  const demos = [];
+  return {
+    name: "generate-html",
+    options(options) {
+      const input = glob.sync(options.input);
+      return {
+        ...options,
+        input,
+      };
+    },
+    buildStart() {
+      demos.splice(0);
+    },
+    load(id) {
+      if (/\.demo\.(ts|js)$/g.test(id)) {
+        const path = id.split("\\");
+        demos.push(path[path.length - 1]);
+      }
+    },
+    generateBundle() {
+      demos.forEach((id) => {
+        const fileName = `${id.replace(/ts|js$/g, "")}.html`;
+        this.emitFile({
+          type: "asset",
+          fileName,
+          source: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Title</title>
+           </head>
+          <body>
+            <script src="${fileName}.js" type="module"></script>
+          </body>
+          </html>`,
+        });
+      });
+    },
+  };
 }
 
-const files = fs.readdirSync("./examples");
-
-const input = [];
-const htmls = [];
-
-files.forEach((f) => {
-  if (/.+\.demo\.ts$/g.test(f)) {
-    const name = f.replace(/\.demo\.ts$/g, "");
-    const fillname = f.replace(/\.ts$/g, ".js");
-    input.push(`examples/${f}`);
-    htmls.push(f);
-    fs.writeFileSync(
-      `./dist/${name}.html`,
-      `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${name}</title>
-          <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                width: 100%;
-                height: 100vh;
-            }
-
-            #root {
-                width: 100%;
-                height: 100%;
-            }
-          </style>
-        </head>
-        <body>
-          <div id="root">
-          </div>
-          <script src="./${fillname}" type="module"></script>
-        </body>
-      </html>
-      `
-    );
-  }
-});
-
-fs.writeFileSync(
-  "./dist/examples.json",
-  `const examples = ${JSON.stringify(htmls)}`
-);
-
 const rollup = {
-  input,
+  input: "examples/*.demo.ts",
   output: {
     dir: dir,
     format: "esm",
+    sourcemap: true,
   },
+  external: ["d3"],
   plugins: [
-    nodeResolve({
-      extensions: [".js", ".ts"],
-      modulesOnly: true,
-    }),
+    generateHtmlPlugin(),
+    nodeResolve(),
     commonjs(),
     progress(),
     json(),
@@ -117,9 +104,9 @@ const rollup = {
       },
     }),
   ],
-  external: ["node_modules/*"],
   watch: {
     clearScreen: false,
+    buildDelay: 1000,
   },
 };
 
