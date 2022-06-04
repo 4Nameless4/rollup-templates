@@ -34,25 +34,8 @@ const rollup = {
       plugins: [terser()],
     },
   ],
-  plugins: [
-    nodeResolve({
-      extensions: [".js", ".ts"],
-      modulesOnly: true,
-    }),
-    commonjs(),
-    progress(),
-    json(),
-    typescript({
-      tsconfig: "tsconfig.json",
-      tsconfigOverride: {
-        compilerOptions: {
-          emitDeclarationOnly: false,
-          declaration: false,
-        },
-      },
-    }),
-  ],
-  external: ["node_modules/*"],
+  external: ["d3"],
+  plugins: [nodeResolve(), commonjs(), progress(), json(), typescript()],
 };
 
 export default rollup;

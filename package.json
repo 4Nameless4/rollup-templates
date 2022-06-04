@@ -6,7 +6,7 @@
   "publishConfig": {},
   "scripts": {
     "clean": "rimraf lib",
-    "dts": "tsc",
+    "dts": "tsc -project tsconfig.dts.json",
     "eslint": "eslint src/*.ts",
     "build": "rimraf lib && npm run eslint && rollup -c && npm run dts",
     "dev": "rimraf dist && npm run eslint && rollup -c rollup.config.dev.js -w"
