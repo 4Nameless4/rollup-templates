@@ -10,7 +10,7 @@ import glob from "glob";
 const dir = "./dist";
 
 const ip = [];
-const port = 8080;
+const port = 8000;
 const inf = os.networkInterfaces();
 
 for (let n in inf) {
