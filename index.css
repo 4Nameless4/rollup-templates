@@ -15,27 +15,27 @@ body {
   height: 100%;
 }
 
-.list {
+#list {
   flex: 1;
   height: 100%;
   overflow-y: auto;
 }
 
-.list > div {
+#list > div {
   transition: all 0.3s ease;
 }
 
-.list > div:hover {
+#list > div:hover {
   background: rgb(0 184 255);
   /* border: 1px solid rgb(255, 145, 0); */
 }
 
-.list > div:hover > a {
+#list > div:hover > a {
   color: rgb(238, 255, 0);
   transform: translate3d(30px, 0, 0);
 }
 
-.list a {
+#list a {
   transition: all 0.3s ease;
   padding: 10px;
   display: flex;

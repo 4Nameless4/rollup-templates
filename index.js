@@ -1,27 +1,21 @@
-// import examples from "./dist/examples.json";
+import examples from "./dist/examples.js";
 
-const root = document.querySelector("#root");
-const list = document.querySelector(".list");
-const content = document.querySelector(".content");
+const list = document.querySelector("#list");
 
-examples &&
-  Array.isArray(examples) &&
-  examples.forEach((es) => {
-    const name = es.replace(/\.demo\.ts$/g, "");
+for (const id in examples) {
+  const { name, htmlName, jsName } = examples[id]
+  const item = document.createElement("div");
+  const link = document.createElement("a");
 
-    const item = document.createElement("div");
-    const link = document.createElement("a");
+  item.classList.add("item");
+  link.classList.add("link");
 
-    item.classList.add(es);
+  link.text = name;
 
-    link.classList.add("link");
+  link.href = `/dist/${htmlName}`;
 
-    link.text = name;
+  link.target = "demoContent";
 
-    link.href = `/dist/${name}.html`;
-
-    link.target = "demoContent";
-
-    item.appendChild(link);
-    list.appendChild(item);
-  });
+  item.appendChild(link);
+  list.appendChild(item);
+}

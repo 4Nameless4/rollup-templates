@@ -6,6 +6,8 @@ import json from "@rollup/plugin-json";
 import serve from "rollup-plugin-serve";
 import os from "os";
 import glob from "glob";
+import fs from "fs";
+import path from "path";
 
 const dir = "./dist";
 
@@ -22,96 +24,122 @@ for (let n in inf) {
 }
 
 function generateHtmlPlugin() {
-  const demos = [];
+  const htmlMatch = "examples/**/*.html";
+  let demos = {};
+  let htmls = [];
   let dir;
+
+  function generateJsDemo(demoPath) {
+    if (/\.demo\.(ts|js)$/g.test(demoPath)) {
+      const pathsSplit = demoPath.split("\\");
+      const fileFullName = pathsSplit[pathsSplit.length - 1];
+      const fileName = fileFullName.replace(/\.ts|js$/g, "");
+      const name = fileName.replace(/\.demo$/g, "");
+      const htmlName = name + ".html";
+      const jsName = fileName + ".js";
+      const dir = path.dirname(demoPath);
+      demos[demoPath] = {
+        path: demoPath,
+        fileFullName,
+        fileName,
+        name,
+        htmlName,
+        jsName,
+        dir,
+      };
+
+      let htmlSource = `<!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Title</title>
+          <link rel="stylesheet" href="/index.css" />
+        </head>
+        <body>
+          <div id="root"></div>
+          <script src="./${jsName}" type="module"></script>
+        </body>
+      </html>`;
+
+      this.emitFile({
+        type: "asset",
+        fileName: htmlName,
+        source: htmlSource,
+      });
+    }
+  }
+
+  function generateHTMLDemo(htmlPath) {
+    if (/\.html$/g.test(htmlPath)) {
+      const pathsSplit = htmlPath.split("\\");
+      const fileFullName = pathsSplit[pathsSplit.length - 1];
+      const fileName = fileFullName.replace(/\.html$/g, "");
+      const name = fileName;
+      const htmlName = name + ".html";
+      const jsName = fileName + ".js";
+      const dir = path.dirname(htmlPath);
+      return (demos[htmlPath] = {
+        path: htmlPath,
+        fileFullName,
+        fileName,
+        name,
+        htmlName,
+        jsName,
+        dir,
+      });
+    }
+  }
 
   return {
     name: "generate-html",
     options(options) {
+      demos = {};
       const input = glob.sync(options.input);
+      glob.sync(htmlMatch).forEach((hl) => {
+        const html = generateHTMLDemo(path.join(__dirname, hl));
+        htmls.push(html);
+        const scriptPath = path.join(html.dir, html.fileName + ".ts");
+        if (html && fs.existsSync(scriptPath)) {
+          input.push(hl.replace(".html", ".ts"));
+        }
+      });
       dir = options.input.split("/")[0];
       return {
         ...options,
         input,
       };
     },
-    buildStart() {
-      demos.splice(0);
+    buildStart(options) {
       this.addWatchFile(dir);
     },
-    load(id) {
-      if (/\.demo\.(ts|js)$/g.test(id)) {
-        const path = id.split("\\");
-        demos.push(path[path.length - 1]);
-      }
+    load(path) {
+      generateJsDemo.call(this, path);
     },
     generateBundle() {
-      demos.forEach((id) => {
-        const fileName = `${id.replace(/\.ts|js$/g, "")}`;
-        this.emitFile({
-          type: "asset",
-          fileName: `${fileName}.html`,
-          source: `<!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="UTF-8">
-                <title>Title</title>
-                <link rel="stylesheet" href="/index.css" />
-              </head>
-              <body>
-                <div id="root"></div>
-                <script src="./${fileName}.js" type="module"></script>
-              </body>
-            </html>`,
-        });
+      htmls.forEach((html) => {
+        const fileFullName = html.fileFullName;
+        const filePath = html.path;
+        if (fs.existsSync(filePath)) {
+          const f = fs.readFileSync(filePath, { encoding: "utf-8" });
+          this.emitFile({
+            type: "asset",
+            fileName: fileFullName,
+            source: f,
+          });
+        }
       });
-      let source = `
-        const root = document.querySelector("#root");
-        const list = document.querySelector(".list");
-        const content = document.querySelector(".content");
-        
-        const demos = `;
-
-      source += JSON.stringify(demos);
-
-      source += `
-      demos.forEach((es)=>{
-        const name = es.replace(/\.demo\.(ts|js)$/g, "");
-        const filename = es.replace(/\.(ts|js)$/g, "");
-        
-        const item = document.createElement("div");
-        const link = document.createElement("a");
-        
-        item.classList.add(es);
-        
-        link.classList.add("link");
-        
-        link.text = name;
-        
-        link.href = 
-        `;
-
-      source += "`/dist/${filename}.html`";
-
-      source += `
-        link.target = "demoContent";
-        
-        item.appendChild(link);
-        list.appendChild(item);
-        
-      })`;
 
       this.emitFile({
         type: "asset",
-        fileName: "index.js",
-        source,
+        fileName: "examples.js",
+        source: `export default ${JSON.stringify(demos)}`,
       });
     },
   };
 }
 
 const rollup = {
-  input: "examples/*.demo.ts",
+  input: "examples/**/*.demo.ts",
   output: {
     dir: dir,
     format: "esm",
