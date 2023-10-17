@@ -95,7 +95,10 @@ function generateHtmlPlugin() {
     options(options) {
       demos = {};
       const input = glob.sync(options.input);
+
+      // 以下是html和.js的格式的demo，不是.demo.js
       glob.sync(htmlMatch).forEach((hl) => {
+        debugger;
         const html = generateHTMLDemo(path.join(__dirname, hl));
         htmls.push(html);
         const scriptPath = path.join(html.dir, html.fileName + ".ts");
@@ -139,7 +142,7 @@ function generateHtmlPlugin() {
 }
 
 const rollup = {
-  input: "examples/**/*.demo.ts",
+  input: "examples/**/*.demo.?(ts|tsx|js)",
   output: {
     dir: dir,
     format: "esm",

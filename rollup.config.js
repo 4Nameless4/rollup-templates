@@ -13,7 +13,7 @@ const name = pkg.main.match(/.+(?=.js$)/g)[0];
 const file = `${dir}/${name}`;
 
 const rollup = {
-  input: "./src/index.ts",
+  input: "./src/index.?(ts|tsx|js)",
   output: [
     {
       file: `${file}.js`,
