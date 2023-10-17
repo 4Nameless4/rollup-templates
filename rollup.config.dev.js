@@ -6,10 +6,11 @@ import json from "@rollup/plugin-json";
 import serve from "rollup-plugin-serve";
 import os from "os";
 import glob from "glob";
-import fs from "fs";
+// import fs from "fs";
 import path from "path";
 
 const dir = "./dist";
+const fileType = "ts|tsx|js|jsx";
 
 const ip = [];
 const port = 8000;
@@ -24,16 +25,16 @@ for (let n in inf) {
 }
 
 function generateHtmlPlugin() {
-  const htmlMatch = "examples/**/*.html";
+  // const htmlMatch = "examples/**/*.html";
   let demos = {};
-  let htmls = [];
+  // let htmls = [];
   let dir;
 
   function generateJsDemo(demoPath) {
-    if (/\.demo\.(ts|js)$/g.test(demoPath)) {
+    if (RegExp(`.demo.(${fileType})$`, "gi").test(demoPath)) {
       const pathsSplit = demoPath.split("\\");
       const fileFullName = pathsSplit[pathsSplit.length - 1];
-      const fileName = fileFullName.replace(/\.ts|js$/g, "");
+      const fileName = fileFullName.replace(RegExp(`.(${fileType})$`, "g"), "");
       const name = fileName.replace(/\.demo$/g, "");
       const htmlName = name + ".html";
       const jsName = fileName + ".js";
@@ -69,26 +70,26 @@ function generateHtmlPlugin() {
     }
   }
 
-  function generateHTMLDemo(htmlPath) {
-    if (/\.html$/g.test(htmlPath)) {
-      const pathsSplit = htmlPath.split("\\");
-      const fileFullName = pathsSplit[pathsSplit.length - 1];
-      const fileName = fileFullName.replace(/\.html$/g, "");
-      const name = fileName;
-      const htmlName = name + ".html";
-      const jsName = fileName + ".js";
-      const dir = path.dirname(htmlPath);
-      return (demos[htmlPath] = {
-        path: htmlPath,
-        fileFullName,
-        fileName,
-        name,
-        htmlName,
-        jsName,
-        dir,
-      });
-    }
-  }
+  // function generateHTMLDemo(htmlPath) {
+  //   if (/\.html$/g.test(htmlPath)) {
+  //     const pathsSplit = htmlPath.split("\\");
+  //     const fileFullName = pathsSplit[pathsSplit.length - 1];
+  //     const fileName = fileFullName.replace(/\.html$/g, "");
+  //     const name = fileName;
+  //     const htmlName = name + ".html";
+  //     const jsName = fileName + ".js";
+  //     const dir = path.dirname(htmlPath);
+  //     return (demos[htmlPath] = {
+  //       path: htmlPath,
+  //       fileFullName,
+  //       fileName,
+  //       name,
+  //       htmlName,
+  //       jsName,
+  //       dir,
+  //     });
+  //   }
+  // }
 
   return {
     name: "generate-html",
@@ -97,15 +98,14 @@ function generateHtmlPlugin() {
       const input = glob.sync(options.input);
 
       // 以下是html和.js的格式的demo，不是.demo.js
-      glob.sync(htmlMatch).forEach((hl) => {
-        debugger;
-        const html = generateHTMLDemo(path.join(__dirname, hl));
-        htmls.push(html);
-        const scriptPath = path.join(html.dir, html.fileName + ".ts");
-        if (html && fs.existsSync(scriptPath)) {
-          input.push(hl.replace(".html", ".ts"));
-        }
-      });
+      // glob.sync(htmlMatch).forEach((hl) => {
+      //   const html = generateHTMLDemo(path.join(__dirname, hl));
+      //   htmls.push(html);
+      //   const scriptPath = path.join(html.dir, html.fileName + ".ts");
+      //   if (html && fs.existsSync(scriptPath)) {
+      //     input.push(hl.replace(".html", ".ts"));
+      //   }
+      // });
       dir = options.input.split("/")[0];
       return {
         ...options,
@@ -119,18 +119,18 @@ function generateHtmlPlugin() {
       generateJsDemo.call(this, path);
     },
     generateBundle() {
-      htmls.forEach((html) => {
-        const fileFullName = html.fileFullName;
-        const filePath = html.path;
-        if (fs.existsSync(filePath)) {
-          const f = fs.readFileSync(filePath, { encoding: "utf-8" });
-          this.emitFile({
-            type: "asset",
-            fileName: fileFullName,
-            source: f,
-          });
-        }
-      });
+      // htmls.forEach((html) => {
+      //   const fileFullName = html.fileFullName;
+      //   const filePath = html.path;
+      //   if (fs.existsSync(filePath)) {
+      //     const f = fs.readFileSync(filePath, { encoding: "utf-8" });
+      //     this.emitFile({
+      //       type: "asset",
+      //       fileName: fileFullName,
+      //       source: f,
+      //     });
+      //   }
+      // });
 
       this.emitFile({
         type: "asset",
@@ -142,7 +142,7 @@ function generateHtmlPlugin() {
 }
 
 const rollup = {
-  input: "examples/**/*.demo.?(ts|tsx|js)",
+  input: `examples/**/*.demo.?(${fileType})`,
   output: {
     dir: dir,
     format: "esm",
