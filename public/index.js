@@ -1,4 +1,4 @@
-import examples from "./dist/examples.js";
+import examples from "./examples.js";
 
 const list = document.querySelector("#list");
 
@@ -12,7 +12,7 @@ for (const id in examples) {
 
   link.text = name;
 
-  link.href = `/dist/${htmlName}`;
+  link.href = `./${htmlName}`;
 
   link.target = "demoContent";
 

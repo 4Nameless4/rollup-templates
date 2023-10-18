@@ -4,25 +4,13 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import serve from "rollup-plugin-serve";
-import os from "os";
 import glob from "glob";
 // import fs from "fs";
 import path from "path";
+import chalk from "chalk";
 
 const dir = "./dist";
 const fileType = "ts|tsx|js|jsx";
-
-const ip = [];
-const port = 8000;
-const inf = os.networkInterfaces();
-
-for (let n in inf) {
-  for (let i in inf[n]) {
-    if (inf[n][i].family === "IPv4") {
-      ip.push(inf[n][i].address);
-    }
-  }
-}
 
 function generateHtmlPlugin() {
   // const htmlMatch = "examples/**/*.html";
@@ -156,18 +144,27 @@ const rollup = {
     json(),
     typescript(),
     serve({
-      contentBase: "",
-      port,
-      onListening: (serve) => {
+      contentBase: ["./public", "./dist"],
+      port: 8000,
+      onListening: function (server) {
+        const address = server.address();
+        const host = address.address === "::" ? "localhost" : address.address;
+        // by using a bound function, we can access options as `this`
+        const protocol = this.https ? "https" : "http";
+
         console.log();
-        console.log("***************************************************");
+        console.log(
+          chalk.blue("***************************************************")
+        );
         console.log();
         console.log("        serve start listen on:");
-        ip.forEach((_ip) => {
-          console.log(`        http://${_ip}:${port}`);
-        });
+        console.log(
+          chalk.green(`        ${protocol}://${host}:${address.port}`)
+        );
         console.log();
-        console.log("***************************************************");
+        console.log(
+          chalk.blue("***************************************************")
+        );
         console.log();
       },
     }),
