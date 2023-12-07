@@ -117,17 +117,22 @@ function publicResolve(
       if (/\.(css|less|sass|postcss|stylus)$/g.test(id)) {
         const _postPlugins: postcss.AcceptedPlugin[] = postPlugins.concat([]);
 
+        let exportCssJSON;
         if (/\.module\.[^.]+$/.test(id)) {
-          _postPlugins.push(postcssModules({}));
+          _postPlugins.push(
+            postcssModules({
+              getJSON(cssFileName, json, outputFileName) {
+                exportCssJSON = json;
+              },
+            })
+          );
         }
-        const post = await postcss(_postPlugins).process(code);
-
-        let _code = "export default undefined";
-        post.messages.forEach((d) => {
-          if (d.type === "export") {
-            _code = `export default ${d.exportToken}`;
-          }
+        const post = await postcss(_postPlugins).process(code, {
+          to: id,
+          from: id,
         });
+
+        let _code = `export default ${JSON.stringify(exportCssJSON)}`;
 
         cssFiles[id] = {
           id,
