@@ -3,6 +3,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
 import terser from "@rollup/plugin-terser";
+import serve from "rollup-plugin-serve";
 import postcss from "postcss";
 import postcssImport from "postcss-import";
 import postcssModules from "postcss-modules";
@@ -222,6 +223,10 @@ const rollup: RollupOptions = {
       sourceMap: !isProduction,
     }),
     json(),
+    !isProduction &&
+      serve({
+        contentBase: "dist",
+      }),
     isProduction && terser(),
   ],
 };
