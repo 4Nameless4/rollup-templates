@@ -11,7 +11,7 @@ import autoprefixer from "autoprefixer";
 import minimist from "minimist";
 import { parse, serialize } from "parse5";
 import { readFileSync, readdirSync } from "fs";
-import { resolve, dirname, basename, extname } from "path";
+import { resolve, dirname, extname } from "path";
 import { fileURLToPath } from "url";
 import { RollupOptions, Plugin, OutputChunk } from "rollup";
 import { rimrafSync } from "rimraf";
@@ -154,7 +154,7 @@ function publicResolve(
     augmentChunkHash() {
       return JSON.stringify(cssFiles);
     },
-    generateBundle(options, bundle) {
+    generateBundle(_, bundle) {
       // get entry info
       const entry: OutputChunk | undefined = Object.values(bundle).find(
         (d) => d.type === "chunk" && d.isEntry
@@ -223,10 +223,7 @@ const rollup: RollupOptions = {
       sourceMap: !isProduction,
     }),
     json(),
-    !isProduction &&
-      serve({
-        contentBase: "dist",
-      }),
+    !isProduction && serve("dist"),
     isProduction && terser(),
   ],
 };
