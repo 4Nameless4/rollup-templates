@@ -18,6 +18,8 @@ import { rimrafSync } from "rimraf";
 
 const argv = minimist(process.argv.slice(2));
 const isProduction = !argv.development;
+const NODE_ENV = isProduction ? "production" : "development";
+process.env.NODE_ENV = NODE_ENV;
 
 function walk<T>(
   data: T | T[],
@@ -115,6 +117,8 @@ function publicResolve(
       return Object.assign(options, { input: reHTML.mainJS });
     },
     async transform(code, id) {
+      // 主要是解析css文件
+      // 这些代码可以直接使用rollup-plugin-postcss
       if (/\.(css|less|sass|postcss|stylus)$/g.test(id)) {
         const _postPlugins: postcss.AcceptedPlugin[] = postPlugins.concat([]);
 
@@ -149,6 +153,12 @@ function publicResolve(
           },
         };
       }
+      // 把文件的 process.env.NODE_ENV 替换掉
+      // 可以使用 @rollup/plugin-replace 插件
+      if (/process.env.NODE_ENV/.test(code)) {
+        return code.replace(/process.env.NODE_ENV/g, `"${NODE_ENV}"`);
+      }
+
       return null;
     },
     augmentChunkHash() {
