@@ -7,8 +7,8 @@
   "publishConfig": {},
   "scripts": {
     "start": "rollup --config rollup.config.ts --configPlugin typescript",
-    "build": "rimraf dist && npm run start",
-    "test": "rimraf dist && node test/**/*.js"
+    "build": "rimraf lib && npm run start",
+    "test": "rimraf lib && node test/**/*.js"
   },
   "repository": {
     "type": "git",
