@@ -3,20 +3,13 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
 import terser from "@rollup/plugin-terser";
-import minimist from "minimist";
-import type { RollupOptions } from "rollup";
-
-const argv = minimist(process.argv.slice(2));
-const isProduction = !argv.development;
-const NODE_ENV = isProduction ? "production" : "development";
-process.env.NODE_ENV = NODE_ENV;
 
 const output = {
-  dir: "dist",
+  dir: "lib",
   entryFileNames: "[name]-[hash].js",
 };
 
-const rollup: RollupOptions = {
+const rollup = {
   input: "src/index.ts",
   output: [
     {
