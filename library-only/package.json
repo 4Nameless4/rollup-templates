@@ -1,0 +1,40 @@
+{
+  "name": "nameless4-common",
+  "version": "0.0.1",
+  "description": "common utils for 4nameless4",
+  "type": "module",
+  "author": "4Nameless4",
+  "publishConfig": {},
+  "scripts": {
+    "start": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "rimraf dist && npm run start",
+    "test": "rimraf dist && node test/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4Nameless4/nameless4-common.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/4Nameless4/nameless4-common/issues"
+  },
+  "homepage": "https://github.com/4Nameless4/nameless4-common#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.10.3",
+    "rollup": "^4.6.1",
+    "terser": "^5.25.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "minimist": "^1.2.8",
+    "rimraf": "^5.0.5",
+    "tape": "^5.7.2"
+  }
+}
