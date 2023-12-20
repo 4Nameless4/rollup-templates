@@ -100,7 +100,6 @@ type t_plugin_html = {
   entryJSPath: string;
   jsName: string;
   css: string;
-  publicMap: Record<string, string>;
 };
 
 // the plugin entryHTMLResolve must put postcssResolve,publicResolve later
@@ -108,6 +107,8 @@ type t_plugin_html = {
 // entryHTMLResolve create index.html by 'htmlSrc'
 export const plugins = (function () {
   const htmls: Map<string, t_plugin_html> = new Map();
+
+  const publicMap: Record<string, string> = {};
 
   return {
     entryHTMLResolve(): Plugin {
@@ -134,7 +135,6 @@ export const plugins = (function () {
               entryJSPath: entry,
               jsName: basename(entry).replace(extname(entry), ""),
               css: "",
-              publicMap: {},
             });
             return entry;
           };
@@ -163,7 +163,21 @@ export const plugins = (function () {
             const originName = d.facadeModuleId;
             const html = htmls.get(originName || "");
             if (!html) continue;
-            const src = html.src.replace(mainJSPlace, d.fileName);
+            // inject replace main javascript
+            let src = html.src.replace(mainJSPlace, d.fileName);
+
+            // public resource replace
+            for (const origin in publicMap) {
+              src = src.replace(origin, publicMap[origin]);
+            }
+
+            if (html.css) {
+              src = src.replace(
+                /<\/head>/,
+                `<link rel="stylesheet" href="${html.css}"/>\n</head>`
+              );
+            }
+
             this.emitFile({
               type: "asset",
               fileName: basename(html.path),
@@ -174,11 +188,6 @@ export const plugins = (function () {
         },
       };
     },
-    /**
-     *
-     * @param options fileName: string default: "style"
-     * @returns
-     */
     postcssResolve(
       options: {
         plugins?: AcceptedPlugin[];
@@ -192,13 +201,12 @@ export const plugins = (function () {
         postcssImport(),
         ...plugins,
       ] as AcceptedPlugin[];
-      const cssFiles: Record<
+      const cssStrs: Record<
         string,
         {
-          path: string;
-          code: string;
-          css: string;
-        }[]
+          str: string;
+          fileName: string;
+        }
       > = {};
 
       let entry: Record<string, string> = {};
@@ -242,21 +250,29 @@ export const plugins = (function () {
               from: file,
             });
 
+            const cssStr = post.css;
+
             let _code = `export default ${JSON.stringify(exportCssJSON)}`;
 
             if (inject) {
               _code =
                 `import styleInject from "style-inject";\n` +
-                `styleInject(${JSON.stringify(post.css)})`;
+                `styleInject(${JSON.stringify(cssStr)})`;
             }
 
-            const entryJS = entry[file];
-            cssFiles[entryJS] ??= [];
-            cssFiles[entryJS].push({
-              path: file,
-              code: _code,
-              css: post.css,
-            });
+            if (!inject) {
+              const entryJS = entry[file];
+              const html = htmls.get(entryJS);
+              if (html) {
+                const fileName = `assets/${html.jsName}.css`;
+                html.css = fileName;
+                cssStrs[entryJS] ??= {
+                  str: "",
+                  fileName,
+                };
+                cssStrs[entryJS].str += cssStr;
+              }
+            }
 
             return _code;
           }
@@ -265,26 +281,14 @@ export const plugins = (function () {
         generateBundle() {
           if (inject) return;
 
-          for (const entryJS in cssFiles) {
-            const html = htmls.get(entryJS);
-            let cssStr = "";
+          for (const entryJS in cssStrs) {
+            const css = cssStrs[entryJS];
 
-            if (!html) return;
-            cssFiles[entryJS].forEach((d) => {
-              cssStr += d.css;
-            });
-
-            const cssFileName = `assets/${html.jsName}.css`;
             this.emitFile({
               type: "asset",
-              source: cssStr,
-              fileName: cssFileName,
+              source: css.str,
+              fileName: css.fileName,
             });
-
-            html.src = html.src.replace(
-              /<\/head>/,
-              `<link rel="stylesheet" href="${cssFileName}"/>\n</head>`
-            );
           }
         },
       };
@@ -293,8 +297,7 @@ export const plugins = (function () {
       const _publicPath = publicPath || "./public";
       return {
         name: "publicResolve",
-        generateBundle() {
-          // generate public resource
+        buildStart() {
           const dir = readdirSync(_publicPath);
           dir.forEach((fileName) => {
             const filePath = resolve(_publicPath, fileName);
@@ -310,9 +313,7 @@ export const plugins = (function () {
             });
 
             this.addWatchFile(filePath);
-            htmls.forEach((d) => {
-              d.src = d.src.replace(fileName, toFileName);
-            });
+            publicMap[fileName] = toFileName;
           });
         },
       };
