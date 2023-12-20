@@ -44,3 +44,5 @@ declare module '*.styl' {}
 declare module '*.stylus' {}
 declare module '*.pcss' {}
 declare module '*.sss' {}
+
+declare module 'rollup-plugin-serve'
