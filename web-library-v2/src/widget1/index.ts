@@ -1,8 +1,8 @@
 // import "../style.module.css";
 
-export default function render() {
-  console.log("test");
-  return {};
+export default function render(props: { entry: string }): string {
+  console.warn("test");
+  return JSON.stringify(props);
 }
 
-console.log("222")
+console.warn("222");

@@ -67,18 +67,48 @@ export function cleanOutputPlugin(): Plugin {
   };
 }
 
+interface t_node {
+  childNodes?: [];
+  nodeName: string;
+  attrs?: {
+    /** The name of the attribute. */
+    name: string;
+    /** The namespace of the attribute. */
+    namespace?: string;
+    /** The namespace-related prefix of the attribute. */
+    prefix?: string;
+    /** The value of the attribute. */
+    value: string;
+  }[];
+}
+
 function resolveHTML(htmlPath: string, mainJSPlace: string) {
   let mainJS = "";
-  let html = readFileSync(htmlPath).toString();
+  const html = readFileSync(htmlPath).toString();
   const fragment = parse(html);
-  const nodes = fragment.childNodes;
+
+  const nodes = fragment.childNodes as t_node[];
+  function isElement(node: { nodeName: string }): boolean {
+    const nodeName = node.nodeName;
+    return !!(
+      nodeName !== "#comment" &&
+      nodeName !== "#text" &&
+      nodeName !== "template" &&
+      nodeName !== "#document" &&
+      nodeName !== "#document-fragment" &&
+      nodeName !== "#documentType"
+    );
+  }
   walk(
     nodes,
     (node) => {
       const nodeName = node.nodeName;
       if (nodeName !== "script") return;
+      if (nodeName !== "script") return;
+      if (nodeName !== "script") return;
       const attrMap = new Map();
-      node.attrs.forEach((d: any) => {
+      const attrs = node.attrs || [];
+      attrs.forEach((d) => {
         attrMap.set(d.name, d);
       });
       if (attrMap.get("type").value === "module") {
@@ -89,24 +119,29 @@ function resolveHTML(htmlPath: string, mainJSPlace: string) {
         return true;
       }
     },
-    (d: any) => d.childNodes
+    (d) => {
+      if (isElement(d)) {
+        return;
+      }
+      return d.childNodes;
+    }
   );
   return { html: serialize(fragment), mainJS };
 }
 // support '1 html' : '1 main entry javascript' only
-type t_plugin_html = {
+interface t_plugin_html {
   src: string;
   path: string;
   entryJSPath: string;
   jsName: string;
   css: string;
-};
+}
 
 // the plugin entryHTMLResolve must put postcssResolve,publicResolve later
 // becuse postcssResolve and publicResolve plugin will change 'htmlSrc'
 // entryHTMLResolve create index.html by 'htmlSrc'
 export const plugins = (function () {
-  const htmls: Map<string, t_plugin_html> = new Map();
+  const htmls = new Map<string, t_plugin_html>();
 
   const publicMap: Record<string, string> = {};
 
@@ -154,9 +189,9 @@ export const plugins = (function () {
         },
         generateBundle(_, bundle) {
           // get entry info
-          const entry: OutputChunk[] | undefined = Object.values(bundle).filter(
+          const entry = Object.values(bundle).filter(
             (d) => d.type === "chunk" && d.isEntry
-          ) as any;
+          ) as OutputChunk[];
           if (!entry || !htmls.size) return;
 
           for (const d of entry) {
