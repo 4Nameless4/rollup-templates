@@ -4,12 +4,10 @@ import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
 import terser from "@rollup/plugin-terser";
 import serve from "rollup-plugin-serve";
-import minimist from "minimist";
 import { cleanOutputPlugin, plugins, replaceStrPlugin } from "./rollup-plugins";
 import type { RollupOptions, OutputOptions } from "rollup";
 
-const argv = minimist(process.argv.slice(2));
-const isProduction = !argv.development;
+const isProduction = process.env.NODE_ENV !== "development";
 const NODE_ENV = isProduction ? "production" : "development";
 process.env.NODE_ENV = NODE_ENV;
 

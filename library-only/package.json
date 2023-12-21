@@ -1,38 +1,48 @@
 {
-  "name": "nameless4-common",
+  "name": "library-only",
   "version": "0.0.1",
-  "description": "common utils for 4nameless4",
+  "description": "",
   "type": "module",
   "author": "4Nameless4",
   "publishConfig": {},
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.mjs",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "start": "rollup --config rollup.config.ts --configPlugin typescript",
-    "build": "rimraf lib && npm run start",
-    "test": "rimraf lib && node test/**/*.js"
+    "clean": "rimraf lib",
+    "lint": "eslint",
+    "test": "",
+    "build": "run-s clean lint test start",
+    "dev": "cross-env NODE_ENV=development pnpm run start -w"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/4Nameless4/nameless4-common.git"
+    "url": "git+https://github.com/4Nameless4/rollup-typescript-libraries-template.git"
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/4Nameless4/nameless4-common/issues"
+    "url": "https://github.com/4Nameless4/rollup-typescript-libraries-template/issues"
   },
-  "homepage": "https://github.com/4Nameless4/nameless4-common#readme",
+  "homepage": "https://github.com/4Nameless4/rollup-typescript-libraries-template#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
     "@types/node": "^20.10.3",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.56.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.5",
     "rollup": "^4.6.1",
+    "rollup-plugin-dts": "^6.1.0",
     "terser": "^5.25.0",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.2",
-    "rollup-plugin-dts": "^6.1.0"
-  },
-  "dependencies": {
-    "rimraf": "^5.0.5"
+    "typescript": "^5.3.2"
   }
 }

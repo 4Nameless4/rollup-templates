@@ -1,3 +1,3 @@
-export function test2() {
-  return 2 + 2;
+export function test2(num: number) {
+  return 2 + 2 * num;
 }
