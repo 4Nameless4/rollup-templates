@@ -14,18 +14,20 @@ const NODE_ENV = isProduction ? "production" : "development";
 process.env.NODE_ENV = NODE_ENV;
 
 const rollup: RollupOptions = {
-  input: ["./public/index.html", "./public/index2.html"],
+  input: isProduction
+    ? "src/index.ts"
+    : ["./public/index.html", "./public/index2.html"],
   output: {
     dir: "dist",
     format: "esm",
     entryFileNames: "index.js",
-    sourcemap: !isProduction,
+    // sourcemap: !isProduction,
   },
   plugins: [
     cleanOutputPlugin(),
-    plugins.postcssResolve(),
-    plugins.publicResolve(),
     plugins.entryHTMLResolve(),
+    plugins.postcssResolve({ inject: isProduction }),
+    !isProduction && plugins.publicResolve(),
     replaceStrPlugin({
       replace: {
         "process.env.NODE_ENV": `"${NODE_ENV}"`,

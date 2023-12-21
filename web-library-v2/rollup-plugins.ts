@@ -7,7 +7,7 @@ import { parse, serialize } from "parse5";
 import { readFileSync, readdirSync } from "fs";
 import { resolve, dirname, extname, basename } from "path";
 import { fileURLToPath } from "url";
-import { rimraf } from "rimraf";
+import { rimrafSync } from "rimraf";
 import type { Plugin, OutputChunk } from "rollup";
 
 function walk<T>(
@@ -61,8 +61,8 @@ export function replaceStrPlugin(options: {
 export function cleanOutputPlugin(): Plugin {
   return {
     name: "clearPlugin",
-    async generateBundle({ dir }) {
-      await (dir && rimraf(dir));
+    generateBundle({ dir }) {
+      dir && rimrafSync(dir);
     },
   };
 }
@@ -257,7 +257,8 @@ export const plugins = (function () {
             if (inject) {
               _code =
                 `import styleInject from "style-inject";\n` +
-                `styleInject(${JSON.stringify(cssStr)})`;
+                `styleInject(${JSON.stringify(cssStr)});\n` +
+                `export default ${JSON.stringify(exportCssJSON)}`;
             }
 
             if (!inject) {
@@ -274,7 +275,12 @@ export const plugins = (function () {
               }
             }
 
-            return _code;
+            return {
+              code: _code,
+              map: {
+                mappings: "",
+              },
+            };
           }
           return null;
         },
