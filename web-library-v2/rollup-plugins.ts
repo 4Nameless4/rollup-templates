@@ -120,7 +120,7 @@ function resolveHTML(htmlPath: string, mainJSPlace: string) {
       }
     },
     (d) => {
-      if (isElement(d)) {
+      if (!isElement(d)) {
         return;
       }
       return d.childNodes;

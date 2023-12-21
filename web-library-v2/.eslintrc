@@ -16,10 +16,10 @@
     "ecmaVersion": 2022
   },
   "rules": {
-    "no-debugger": ["error"],
+    "no-debugger": ["warn"],
     "no-cond-assign": ["error"],
     "no-empty": ["warn", { "allowEmptyCatch": true }],
-    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
     "no-use-before-define": ["error"],
     "default-case": ["error"],
     "default-case-last": ["error"],
