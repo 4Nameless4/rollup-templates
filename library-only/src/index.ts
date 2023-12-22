@@ -1,10 +1,7 @@
-import { test2 } from "./index2";
-export * as test2 from "./index2";
+import { run2 } from "./index2";
+export * as index2 from "./index2";
 
-export function test(num: number) {
-  let a = test2(num);
-  if (process.env.NODE_ENV === "production") {
-    a = 0;
-  }
+export function run1(num: number) {
+  const a = run2(num);
   return 1 + 1 + a + num;
 }
