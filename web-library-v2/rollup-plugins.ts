@@ -51,7 +51,12 @@ export function replaceStrPlugin(options: {
       for (const key in options.replace) {
         const _key = new RegExp(`\\b${key}\\b`, "g");
         if (_key.test(code)) {
-          return code.replace(_key, options.replace[key]);
+          return {
+            code: code.replace(_key, options.replace[key]),
+            map: {
+              mappings: "",
+            },
+          };
         }
       }
     },
@@ -251,7 +256,11 @@ export const plugins = (function () {
         buildStart() {
           entry = {};
         },
-        resolveId(src, importer) {
+        async resolveId(source, importer, options) {
+          const resolvedId = await this.resolve(source, importer, options);
+
+          if (!resolvedId) return;
+          const srcID = resolvedId.id;
           if (!importer) {
             return;
           } else if (entry[importer]) {
@@ -259,9 +268,9 @@ export const plugins = (function () {
             while (entry[entryImport]) {
               entryImport = entry[entryImport];
             }
-            entry[src] = entryImport;
+            entry[srcID] = entryImport;
           } else {
-            entry[src] = importer;
+            entry[srcID] = importer;
           }
         },
         async transform(code, file) {
