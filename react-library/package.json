@@ -1,10 +1,10 @@
 {
-  "name": "rollup-typescript-libraries-template",
+  "name": "react-typescript-library",
   "version": "0.0.1",
-  "description": "rollup-typescript-libraries-template",
+  "description": "react-typescript-library",
   "type": "module",
   "author": "4Nameless4",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/@types",
   "publishConfig": {},
@@ -33,10 +33,13 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
     "@types/jest": "^29.5.11",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20.10.3",
     "@types/postcss-import": "^14.0.3",
+    "@types/react-test-renderer": "^18.0.7",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "autoprefixer": "^10.4.16",
@@ -50,6 +53,7 @@
     "postcss": "^8.4.32",
     "postcss-import": "^15.1.0",
     "postcss-modules": "^6.0.0",
+    "react-test-renderer": "^18.2.0",
     "rimraf": "^5.0.5",
     "rollup": "^4.6.1",
     "rollup-plugin-serve": "^3.0.0",
@@ -58,5 +62,11 @@
     "ts-jest": "^29.1.1",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

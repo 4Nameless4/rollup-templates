@@ -1,9 +1,8 @@
-import { describe, expect, test } from "@jest/globals";
-import { widget1 } from "../src/index";
+import widget1 from "../src/widget1";
 
 describe("widget1 module", () => {
   test("widget1 module render 1 to equal {entry:1}", () => {
-    expect(widget1.default({ entry: "1" })).toBe(
+    expect(widget1({ entry: "1" })).toBe(
       JSON.stringify({ entry: "1" })
     );
   });
