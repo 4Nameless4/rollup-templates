@@ -12,7 +12,7 @@
     "start": "rollup --config rollup.config.ts --configPlugin typescript",
     "dts": "tsc -project tsconfig.dts.json",
     "lint": "eslint",
-    "test": "jest -c ./jest/jest.config.cjs",
+    "test": "rimraf test/__snapshots__ && jest -c ./jest/jest.config.cjs",
     "clean": "rimraf dist",
     "build": "run-s lint test clean dts start",
     "dev": "cross-env NODE_ENV=development pnpm run start -w"
