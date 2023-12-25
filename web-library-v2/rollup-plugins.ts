@@ -9,37 +9,7 @@ import { resolve, dirname, extname, basename } from "path";
 import { fileURLToPath } from "url";
 import { rimrafSync } from "rimraf";
 import type { Plugin, OutputChunk } from "rollup";
-
-function walk<T>(
-  data: T | T[],
-  call: (data: T, deep: number, pre: T | null) => boolean | void | undefined,
-  getChildren: (
-    data: T,
-    deep: number,
-    pre: T | null
-  ) => T[] | false | void | undefined
-) {
-  let deep = 0;
-  let pre: T | null = null;
-  function _walk(data: T) {
-    const result = call(data, deep, pre);
-    const children = getChildren(data, deep, pre);
-    pre = data;
-    deep++;
-    if (children && !result) {
-      children.forEach((d) => {
-        _walk(d);
-      });
-    }
-  }
-  if (Array.isArray(data)) {
-    data.forEach((d) => {
-      _walk(d);
-    });
-  } else {
-    _walk(data);
-  }
-}
+import { walk } from "nameless4-common";
 
 export function replaceStrPlugin(options: {
   replace: Record<string, string>;
