@@ -1,1 +1,1 @@
-# React Rollup Component Library
+# Rollup Typescript Web Template v2
