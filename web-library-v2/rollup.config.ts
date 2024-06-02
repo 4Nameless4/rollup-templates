@@ -3,8 +3,12 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
 import terser from "@rollup/plugin-terser";
-import serve from "rollup-plugin-serve";
-import { cleanOutputPlugin, plugins, replaceStrPlugin } from "./rollup-plugins";
+import {
+  cleanOutputPlugin,
+  plugins,
+  replaceStrPlugin,
+  server,
+} from "./rollup-plugins";
 import type { RollupOptions, OutputOptions } from "rollup";
 
 const isProduction = process.env.NODE_ENV !== "development";
@@ -51,7 +55,12 @@ const rollup: RollupOptions = {
   output,
   plugins: [
     ...rollupPlugins,
-    !isProduction && serve("dist"),
+    !isProduction &&
+      server({
+        contentBase: "dist",
+        port: 8080,
+        verbose: true,
+      }),
     isProduction && terser(),
   ],
 };
