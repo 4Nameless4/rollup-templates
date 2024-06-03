@@ -1,0 +1,29 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "set MODE=production && npm run start",
+    "dev": "set MODE=development && npm run start"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.8",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^20.14.0",
+    "@types/rimraf": "^4.0.5",
+    "@types/rollup": "^0.54.0",
+    "rimraf": "^5.0.7",
+    "rollup": "^4.18.0",
+    "rollup-plugin-serve": "^1.1.1",
+    "tslib": "^2.6.2"
+  },
+  "dependencies": {
+    "nameless4-common": "^0.0.3"
+  }
+}
