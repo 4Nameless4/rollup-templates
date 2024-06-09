@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "rollup --config rollup.config.ts --configPlugin typescript"
+    "start": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "npm run test && npm run start",
+    "test": "jest -c ./jest.config.cjs"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +22,7 @@
     "jest": "^29.7.0",
     "rimraf": "^5.0.7",
     "rollup": "^4.18.0",
+    "ts-jest": "^29.1.4",
     "tslib": "^2.6.2"
   },
   "dependencies": {

@@ -110,7 +110,6 @@
     "src/**/*.ts",
     "rollup.config.ts",
     "rollupPlugins.ts",
-    "types/**/*.ts",
-    "node_modules"
+    "types/**/*.ts"
   ]
 }
