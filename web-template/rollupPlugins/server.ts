@@ -1,19 +1,12 @@
-import { rimrafSync } from "rimraf";
 import type { Plugin } from "rollup";
-import serve from "rollup-plugin-serve";
 import { IncomingMessage, Server, ServerResponse } from "http";
+import serve from "rollup-plugin-serve";
 
-export function cleanOutputPlugin(): Plugin {
-  return {
-    name: "clearPlugin",
-    generateBundle({ dir }) {
-      dir && rimrafSync(dir);
-    },
-  };
-}
-
-type t_serve_server = Server<typeof IncomingMessage, typeof ServerResponse>;
-interface t_serve_options {
+export type t_serve_sever = Server<
+  typeof IncomingMessage,
+  typeof ServerResponse
+>;
+export interface t_serve_options {
   // Launch in browser (default: false)
   open?: boolean;
 
@@ -52,23 +45,30 @@ interface t_serve_options {
   mimeTypes?: Record<string, any>;
 
   // execute function after server has begun listening
-  onListening?: (sev: t_serve_server) => void;
+  onListening?: (sev: t_serve_sever) => void;
 
-  onGenerated?: (sev: t_serve_server) => void;
+  onGenerated?: (sev: t_serve_sever) => void;
 }
 
 export function green(text: string) {
   return "\u001b[1m\u001b[32m" + text + "\u001b[39m\u001b[22m";
 }
 
-export function server(options: t_serve_options = {}): Plugin {
+const defaultOptions: t_serve_options = {
+  open: true,
+  port: 8000,
+  verbose: true,
+  contentBase: "dist"
+}
+
+export default function server(options?: t_serve_options): Plugin {
+  options = Object.assign({}, defaultOptions, options)
   const { onGenerated, onListening, verbose, https } = options;
-  let httpSev: null | t_serve_server = null;
+  let httpSev: null | t_serve_sever = null;
   const server = serve({
     ...options,
-    port: options.port || 8000,
     verbose: false,
-    onListening(sev: t_serve_server) {
+    onListening(sev: t_serve_sever) {
       onListening && onListening(sev);
       httpSev = sev;
     },
@@ -93,21 +93,11 @@ export function server(options: t_serve_options = {}): Plugin {
         this.info("");
         this.info("************** Server ready **************");
         this.info("");
-        this.info(`${green(`${protocol}://${host}:${address.port}`)}`);
+        this.info(`     ${green(`${protocol}://${host}:${address.port}`)}`);
         this.info("");
         this.info("************** Server ready **************");
         this.info("");
       }
     },
   };
-}
-
-interface t_genhtml_options {
-  template: string | string[]
-}
-
-const defaultHTMLTemplate = ``
-
-export function genHtml(options: t_genhtml_options) {
-
 }
